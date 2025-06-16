@@ -1,0 +1,21 @@
+{
+  "name": "Syna Malhan",
+  "email": "syna@example.com",
+  "summary": "Computer Science sophomore passionate about AI, full-stack development, and data-driven solutions.",
+  "education": [
+    {
+      "institution": "Arizona State University",
+      "degree": "B.S. in Computer Science",
+      "start": "2023",
+      "end": "2027"
+    }
+  ],
+  "experience": [],
+  "projects": [],
+  "skills": [
+    "Python",
+    "React",
+    "Neo4j",
+    "LLMs"
+  ]
+}
