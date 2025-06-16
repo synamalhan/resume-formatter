@@ -220,5 +220,5 @@ def generate_pdf(data, font="Arial", font_size=10, spacing=6):
 
     draw_divider()
 
-    pdf_bytes = pdf.output(dest='S')
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
     return BytesIO(pdf_bytes)
