@@ -45,9 +45,9 @@ class ResumePDF(FPDF):
             ])
 
             try:
-                self.multi_cell(0, spacing, f" -  {safe_p}", ln=True)
+                self.multi_cell(0, spacing, f" -  {safe_p}")
             except Exception:
-                self.multi_cell(0, spacing, " -  [Rendering Failed]", ln=True)
+                self.multi_cell(0, spacing, " -  [Rendering Failed]")
 
         self.ln(0.5)
 
