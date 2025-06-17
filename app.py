@@ -30,17 +30,25 @@ def normalize_resume_data(data):
         "experience": add_order(data.get("experience", [])),
         "projects": add_order(data.get("projects", [])),
     }
+
 def experience_section(index, prefill_data):
     key_prefix = f"exp_{index}"
     data = prefill_data[index] if index < len(prefill_data) else {}
 
+    label_key = f"{key_prefix}_label"
     default_label = f"Experience #{index + 1}"
-    label = f"{data.get('title', '')} @ {data.get('company', '')}".strip(" @") or default_label
+    initial_label = f"{data.get('title', '')} @ {data.get('company', '')}".strip(" @") or default_label
+    if label_key not in st.session_state:
+        st.session_state[label_key] = initial_label
 
-    with st.expander(label):
+    with st.expander(st.session_state[label_key]):
         order = st.number_input("Order", min_value=1, value=data.get("order", index + 1), key=f"{key_prefix}_order")
         title = st.text_input("Job Title", value=data.get("title", ""), key=f"{key_prefix}_title")
         company = st.text_input("Company", value=data.get("company", ""), key=f"{key_prefix}_company")
+
+        label_update = f"{title.strip()} @ {company.strip()}".strip(" @") or default_label
+        if label_update != st.session_state[label_key]:
+            st.session_state[label_key] = label_update
 
         col1, col2 = st.columns(2)
         with col1:
@@ -64,14 +72,20 @@ def project_section(index, prefill_data):
     key_prefix = f"proj_{index}"
     data = prefill_data[index] if index < len(prefill_data) else {}
 
-    # Prefer prefilled title, fallback to placeholder
-    project_title = data.get("title", "").strip()
-    label = f"{project_title}" if project_title else f"Project #{index + 1}"
+    label_key = f"{key_prefix}_label"
+    default_label = f"Project #{index + 1}"
+    initial_label = data.get("title", "").strip() or default_label
+    if label_key not in st.session_state:
+        st.session_state[label_key] = initial_label
 
-    with st.expander(label):
+    with st.expander(st.session_state[label_key]):
         order = st.number_input("Order", min_value=1, value=data.get("order", index + 1), key=f"{key_prefix}_order")
-        title = st.text_input("Project Title", value=project_title, key=f"{key_prefix}_title")
+        title = st.text_input("Project Title", value=data.get("title", ""), key=f"{key_prefix}_title")
         stack = st.text_input("Tech Stack", value=data.get("stack", ""), key=f"{key_prefix}_stack")
+
+        label_update = title.strip() or default_label
+        if label_update != st.session_state[label_key]:
+            st.session_state[label_key] = label_update
 
         bullets_raw = st.text_area("Bullet Points (one per line)", value="\n".join(data.get("bullets", [])), key=f"{key_prefix}_bullets")
         bullets = [b.strip() for b in bullets_raw.splitlines() if b.strip()]
@@ -87,16 +101,23 @@ def education_section(index, prefill_data):
     key_prefix = f"edu_{index}"
     data = prefill_data[index] if index < len(prefill_data) else {}
 
+    label_key = f"{key_prefix}_label"
     default_label = f"Education #{index + 1}"
-    label = data.get("university", "").strip() or default_label
+    initial_label = data.get("university", "").strip() or default_label
+    if label_key not in st.session_state:
+        st.session_state[label_key] = initial_label
 
-    with st.expander(label):
+    with st.expander(st.session_state[label_key]):
         order = st.number_input("Order", min_value=1, value=data.get("order", index + 1), key=f"{key_prefix}_order")
         university = st.text_input("University", value=data.get("university", ""), key=f"{key_prefix}_univ")
         gpa = st.text_input("GPA", value=data.get("gpa", ""), key=f"{key_prefix}_gpa")
         grad = st.text_input("Expected Graduation", value=data.get("grad", ""), key=f"{key_prefix}_grad")
         degree = st.text_input("Degree", value=data.get("degree", ""), key=f"{key_prefix}_degree")
         awards = st.text_input("Awards (if any)", value=data.get("awards", ""), key=f"{key_prefix}_awards")
+
+        label_update = university.strip() or default_label
+        if label_update != st.session_state[label_key]:
+            st.session_state[label_key] = label_update
 
         return {
             "order": order,
@@ -107,24 +128,20 @@ def education_section(index, prefill_data):
             "awards": awards
         }
 
-
-# --- Layout ---
-st.title("📄 Resume Builder with Ordering")
-
-# --- Sidebar ---
+# Sidebar and inputs
+st.title("📄 Resume Builder with Live Label Updates")
 st.sidebar.header("📤 Upload Resume (JSON)")
 uploaded_json = st.sidebar.file_uploader("Upload JSON", type="json")
 
 if uploaded_json:
     uploaded_data = normalize_resume_data(json.load(uploaded_json))
-
     for k, v in uploaded_data.items():
         if k not in ["experience", "projects", "education"]:
             st.session_state[k] = v
-
     st.session_state["experience_data"] = uploaded_data.get("experience", [])
     st.session_state["projects_data"] = uploaded_data.get("projects", [])
     st.session_state["education_data"] = uploaded_data.get("education", [])
+
 if "remove_exp" not in st.session_state:
     st.session_state["remove_exp"] = set()
 if "remove_proj" not in st.session_state:
@@ -132,13 +149,12 @@ if "remove_proj" not in st.session_state:
 if "remove_edu" not in st.session_state:
     st.session_state["remove_edu"] = set()
 
-
 st.sidebar.header("🖋️ Formatting")
 font = st.sidebar.selectbox("Font", ["Arial", "Helvetica", "Times"])
 font_size = st.sidebar.slider("Font Size", 8, 16, 11)
 spacing = st.sidebar.slider("Line Spacing", 4, 20, 8)
 
-# --- Basic Info ---
+# Contact & Summary
 name = st.text_input("Full Name", value=st.session_state.get("name", "SYNA MALHAN"))
 phone = st.text_input("Phone", value=st.session_state.get("phone", ""))
 email = st.text_input("Email", value=st.session_state.get("email", ""))
@@ -150,7 +166,7 @@ summary = st.text_area("Summary", value=st.session_state.get("summary", ""))
 skills_raw = st.text_area("Skills (one per line)", value="\n".join(st.session_state.get("skills", [])))
 skills = [s.strip() for s in skills_raw.splitlines() if s.strip()]
 
-# --- Education ---
+# Education
 st.subheader("🎓 Education")
 num_edu = st.number_input("Number of Education Entries", 1, 5, 1)
 education_data = st.session_state.get("education_data", [])
@@ -164,7 +180,7 @@ for i in range(int(num_edu)):
         st.experimental_rerun()
     education.append(edu_data)
 
-# --- Experience ---
+# Experience
 st.subheader("💼 Experience")
 num_exps = st.number_input("Number of Experiences", 1, 10, 3)
 experience_data = st.session_state.get("experience_data", [])
@@ -178,8 +194,7 @@ for i in range(int(num_exps)):
         st.experimental_rerun()
     experience.append(exp_data)
 
-
-# --- Projects ---
+# Projects
 st.subheader("📁 Projects")
 num_projs = st.number_input("Number of Projects", 1, 15, 3)
 project_data = st.session_state.get("projects_data", [])
@@ -193,7 +208,7 @@ for i in range(int(num_projs)):
         st.experimental_rerun()
     projects.append(proj_data)
 
-# --- Generate PDF ---
+# PDF Generation
 if st.button("Generate PDF"):
     data = {
         "name": name,
@@ -211,22 +226,11 @@ if st.button("Generate PDF"):
     }
 
     pdf_buffer = generate_pdf(data, font=font, font_size=font_size, spacing=spacing)
-
     file_name_base = st.text_input("📁 File Name (without extension)", value="SYNA-MALHAN")
     file_name_base = sanitize_filename(file_name_base.strip() or "SYNA-MALHAN")
-    st.download_button(
-        "📥 Download Resume (PDF)",
-        data=pdf_buffer,
-        file_name=f"{file_name_base}.pdf",
-        mime="application/pdf"
-    )
 
-    st.download_button(
-        "📄 Download Resume (JSON)",
-        data=json.dumps(data, indent=2),
-        file_name=f"{file_name_base}.json",
-        mime="application/json"
-    )
+    st.download_button("📥 Download Resume (PDF)", data=pdf_buffer, file_name=f"{file_name_base}.pdf", mime="application/pdf")
+    st.download_button("📄 Download Resume (JSON)", data=json.dumps(data, indent=2), file_name=f"{file_name_base}.json", mime="application/json")
 
     st.subheader("🖹 PDF Preview")
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
