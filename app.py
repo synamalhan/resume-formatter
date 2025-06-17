@@ -95,7 +95,6 @@ def education_section(index, prefill_data):
         }
 
 # --- Layout ---
-st.set_page_config(layout="wide")
 st.title("📄 Resume Builder with Ordering")
 
 # --- Sidebar ---
