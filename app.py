@@ -9,6 +9,7 @@ import re
 
 def sanitize_filename(name):
     return re.sub(r'[^a-zA-Z0-9_\- ]', '', name)
+
 def normalize_resume_data(data):
     def add_order(entries):
         for i, entry in enumerate(entries):
@@ -29,12 +30,14 @@ def normalize_resume_data(data):
         "experience": add_order(data.get("experience", [])),
         "projects": add_order(data.get("projects", [])),
     }
-
 def experience_section(index, prefill_data):
     key_prefix = f"exp_{index}"
     data = prefill_data[index] if index < len(prefill_data) else {}
 
-    with st.expander(f"Experience #{index + 1}"):
+    default_label = f"Experience #{index + 1}"
+    label = f"{data.get('title', '')} @ {data.get('company', '')}".strip(" @") or default_label
+
+    with st.expander(label):
         order = st.number_input("Order", min_value=1, value=data.get("order", index + 1), key=f"{key_prefix}_order")
         title = st.text_input("Job Title", value=data.get("title", ""), key=f"{key_prefix}_title")
         company = st.text_input("Company", value=data.get("company", ""), key=f"{key_prefix}_company")
@@ -61,7 +64,10 @@ def project_section(index, prefill_data):
     key_prefix = f"proj_{index}"
     data = prefill_data[index] if index < len(prefill_data) else {}
 
-    with st.expander(f"Project #{index + 1}"):
+    default_label = f"Project #{index + 1}"
+    label = data.get("title", "").strip() or default_label
+
+    with st.expander(label):
         order = st.number_input("Order", min_value=1, value=data.get("order", index + 1), key=f"{key_prefix}_order")
         title = st.text_input("Project Title", value=data.get("title", ""), key=f"{key_prefix}_title")
         stack = st.text_input("Tech Stack", value=data.get("stack", ""), key=f"{key_prefix}_stack")
@@ -80,7 +86,10 @@ def education_section(index, prefill_data):
     key_prefix = f"edu_{index}"
     data = prefill_data[index] if index < len(prefill_data) else {}
 
-    with st.expander(f"Education #{index + 1}"):
+    default_label = f"Education #{index + 1}"
+    label = data.get("university", "").strip() or default_label
+
+    with st.expander(label):
         order = st.number_input("Order", min_value=1, value=data.get("order", index + 1), key=f"{key_prefix}_order")
         university = st.text_input("University", value=data.get("university", ""), key=f"{key_prefix}_univ")
         gpa = st.text_input("GPA", value=data.get("gpa", ""), key=f"{key_prefix}_gpa")
@@ -96,6 +105,7 @@ def education_section(index, prefill_data):
             "degree": degree,
             "awards": awards
         }
+
 
 # --- Layout ---
 st.title("📄 Resume Builder with Ordering")
