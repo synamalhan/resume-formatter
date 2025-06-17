@@ -198,8 +198,21 @@ if st.button("Generate PDF"):
 
     pdf_buffer = generate_pdf(data, font=font, font_size=font_size, spacing=spacing)
 
-    st.download_button("📥 Download Resume (PDF)", data=pdf_buffer, file_name="resume.pdf", mime="application/pdf")
-    st.download_button("📄 Download Resume (JSON)", data=json.dumps(data, indent=2), file_name="resume.json", mime="application/json")
+    file_name_base = st.text_input("📁 File Name (without extension)", value="resume")
+
+    st.download_button(
+        "📥 Download Resume (PDF)",
+        data=pdf_buffer,
+        file_name=f"{file_name_base}.pdf",
+        mime="application/pdf"
+    )
+
+    st.download_button(
+        "📄 Download Resume (JSON)",
+        data=json.dumps(data, indent=2),
+        file_name=f"{file_name_base}.json",
+        mime="application/json"
+    )
 
     st.subheader("🖹 PDF Preview")
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
