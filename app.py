@@ -198,7 +198,7 @@ if st.button("Generate PDF"):
 
     pdf_buffer = generate_pdf(data, font=font, font_size=font_size, spacing=spacing)
 
-    file_name_base = st.text_input("📁 File Name (without extension)", value="resume")
+    file_name_base = st.text_input("📁 File Name (without extension)", value="SYNA-MALHAN")
 
     st.download_button(
         "📥 Download Resume (PDF)",
