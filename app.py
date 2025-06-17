@@ -111,12 +111,12 @@ if uploaded_json:
     st.session_state["experience_data"] = uploaded_data.get("experience", [])
     st.session_state["projects_data"] = uploaded_data.get("projects", [])
     st.session_state["education_data"] = uploaded_data.get("education", [])
-    if "remove_exp" not in st.session_state:
-        st.session_state["remove_exp"] = set()
-    if "remove_proj" not in st.session_state:
-        st.session_state["remove_proj"] = set()
-    if "remove_edu" not in st.session_state:
-        st.session_state["remove_edu"] = set()
+if "remove_exp" not in st.session_state:
+    st.session_state["remove_exp"] = set()
+if "remove_proj" not in st.session_state:
+    st.session_state["remove_proj"] = set()
+if "remove_edu" not in st.session_state:
+    st.session_state["remove_edu"] = set()
 
 
 st.sidebar.header("🖋️ Formatting")
