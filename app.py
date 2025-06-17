@@ -5,7 +5,10 @@ from io import BytesIO
 import tempfile
 from datetime import date
 import json
+import re
 
+def sanitize_filename(name):
+    return re.sub(r'[^a-zA-Z0-9_\- ]', '', name)
 def normalize_resume_data(data):
     def add_order(entries):
         for i, entry in enumerate(entries):
@@ -199,7 +202,7 @@ if st.button("Generate PDF"):
     pdf_buffer = generate_pdf(data, font=font, font_size=font_size, spacing=spacing)
 
     file_name_base = st.text_input("📁 File Name (without extension)", value="SYNA-MALHAN")
-
+    file_name_base = sanitize_filename(file_name_base.strip() or "SYNA-MALHAN")
     st.download_button(
         "📥 Download Resume (PDF)",
         data=pdf_buffer,
