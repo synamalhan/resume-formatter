@@ -17,11 +17,11 @@ class ResumePDF(FPDF):
 
     def section_title(self, title, font_size, spacing):
         self.set_font(self.font, 'B', font_size + 1)
-        self.cell(0, spacing + 1, title, ln=True)
+        self.cell(0, spacing + 1, clean_text(title), ln=True)
 
     def section_body(self, text, spacing, font_size):
         self.set_font(self.font, '', font_size)
-        self.multi_cell(0, spacing, text)
+        self.multi_cell(0, spacing, clean_text(text))
         self.ln(0.5)
 
     def bullet_points(self, points, font_size, spacing):
@@ -39,10 +39,12 @@ class ResumePDF(FPDF):
                 p = p[:max_length] + "..."
 
             # Split long unbreakable words
+            cleaned = clean_text(p)
             safe_p = ' '.join([
                 w if len(w) < 50 else ' '.join([w[i:i+50] for i in range(0, len(w), 50)])
-                for w in p.split()
+                for w in cleaned.split()
             ])
+
 
             try:
                 self.multi_cell(0, spacing, f" -  {safe_p}")
