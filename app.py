@@ -64,12 +64,13 @@ def project_section(index, prefill_data):
     key_prefix = f"proj_{index}"
     data = prefill_data[index] if index < len(prefill_data) else {}
 
-    default_label = f"Project #{index + 1}"
-    label = data.get("title", "").strip() or default_label
+    # Prefer prefilled title, fallback to placeholder
+    project_title = data.get("title", "").strip()
+    label = f"{project_title}" if project_title else f"Project #{index + 1}"
 
     with st.expander(label):
         order = st.number_input("Order", min_value=1, value=data.get("order", index + 1), key=f"{key_prefix}_order")
-        title = st.text_input("Project Title", value=data.get("title", ""), key=f"{key_prefix}_title")
+        title = st.text_input("Project Title", value=project_title, key=f"{key_prefix}_title")
         stack = st.text_input("Tech Stack", value=data.get("stack", ""), key=f"{key_prefix}_stack")
 
         bullets_raw = st.text_area("Bullet Points (one per line)", value="\n".join(data.get("bullets", [])), key=f"{key_prefix}_bullets")
