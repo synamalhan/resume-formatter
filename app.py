@@ -111,6 +111,13 @@ if uploaded_json:
     st.session_state["experience_data"] = uploaded_data.get("experience", [])
     st.session_state["projects_data"] = uploaded_data.get("projects", [])
     st.session_state["education_data"] = uploaded_data.get("education", [])
+    if "remove_exp" not in st.session_state:
+        st.session_state["remove_exp"] = set()
+    if "remove_proj" not in st.session_state:
+        st.session_state["remove_proj"] = set()
+    if "remove_edu" not in st.session_state:
+        st.session_state["remove_edu"] = set()
+
 
 st.sidebar.header("🖋️ Formatting")
 font = st.sidebar.selectbox("Font", ["Arial", "Helvetica", "Times"])
@@ -133,19 +140,44 @@ skills = [s.strip() for s in skills_raw.splitlines() if s.strip()]
 st.subheader("🎓 Education")
 num_edu = st.number_input("Number of Education Entries", 1, 5, 1)
 education_data = st.session_state.get("education_data", [])
-education = [education_section(i, education_data) for i in range(int(num_edu))]
+education = []
+for i in range(int(num_edu)):
+    if i in st.session_state["remove_edu"]:
+        continue
+    edu_data = education_section(i, education_data)
+    if st.button(f"🗑 Remove Education #{i+1}", key=f"remove_edu_{i}"):
+        st.session_state["remove_edu"].add(i)
+        st.experimental_rerun()
+    education.append(edu_data)
 
 # --- Experience ---
 st.subheader("💼 Experience")
 num_exps = st.number_input("Number of Experiences", 1, 10, 3)
 experience_data = st.session_state.get("experience_data", [])
-experience = [experience_section(i, experience_data) for i in range(int(num_exps))]
+experience = []
+for i in range(int(num_exps)):
+    if i in st.session_state["remove_exp"]:
+        continue
+    exp_data = experience_section(i, experience_data)
+    if st.button(f"🗑 Remove Experience #{i+1}", key=f"remove_exp_{i}"):
+        st.session_state["remove_exp"].add(i)
+        st.experimental_rerun()
+    experience.append(exp_data)
+
 
 # --- Projects ---
 st.subheader("📁 Projects")
 num_projs = st.number_input("Number of Projects", 1, 15, 3)
 project_data = st.session_state.get("projects_data", [])
-projects = [project_section(i, project_data) for i in range(int(num_projs))]
+projects = []
+for i in range(int(num_projs)):
+    if i in st.session_state["remove_proj"]:
+        continue
+    proj_data = project_section(i, project_data)
+    if st.button(f"🗑 Remove Project #{i+1}", key=f"remove_proj_{i}"):
+        st.session_state["remove_proj"].add(i)
+        st.experimental_rerun()
+    projects.append(proj_data)
 
 # --- Generate PDF ---
 if st.button("Generate PDF"):
